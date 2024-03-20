@@ -1,0 +1,126 @@
+@use 'sass:map';
+@use 'sass:math';
+
+@use '@material/web/tokens/md-sys-color';
+@use '@material/web/tokens/md-sys-typescale';
+
+@use '@material/web/tokens/v0_192/md-comp-elevated-card' as v0_192-md-comp-elevated-card;
+@use '@material/web/tokens/v0_192/md-sys-typescale' as v0_192-md-sys-typescale;
+
+$_default: (
+  'md-sys-color': md-sys-color.values-light(),
+  'md-sys-typescale': md-sys-typescale.values(),
+);
+
+$_sizes: large, medium, small;
+$_groups: display, headline, title, body, label;
+
+@mixin text-sizes($groups: $_groups, $sizes: $_sizes, $deps: $_default) {
+  @each $size in $_sizes {
+    .size-#{$size} {
+      @each $group in $_groups {
+        .text-#{$group} {
+          font-size: map.get($deps, 'md-sys-typescale', $group + '-' + $size + '-size');
+          font-weight: map.get($deps, 'md-sys-typescale', $group + '-' + $size + '-weight');
+          line-height: map.get($deps, 'md-sys-typescale', $group + '-' + $size + '-line-height');
+          letter-spacing: map.get($deps, 'md-sys-typescale', $group + '-' + $size + '-tracking');
+        }
+      }
+    }
+  }
+}
+
+:host {
+  max-width: 1000px;
+  margin: 0 auto;
+
+  display: flex;
+  position: relative;
+
+  flex-direction: column;
+
+  @each $token, $value in v0_192-md-comp-elevated-card.values() {
+    --_panel-#{$token}: #{$value};
+  }
+
+  b,
+  strong {
+    font-weight: var(--md-ref-typeface-weight-bold, 700);
+  }
+  i,
+  em {
+    font-style: italic;
+  }
+}
+
+@include text-sizes();
+
+@function dp($size) {
+  @return math.div($size, 12) * 1rem;
+}
+
+.title {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  img {
+    --height: calc(var(--md-sys-typescale-headline-large-line-height, 2.5rem) * 1.5);
+    height: var(--height);
+    width: var(--height);
+    border-radius: 0.75rem;
+  }
+}
+
+.container {
+  height: 100%;
+}
+
+.panel {
+  background: #fff;
+  border-radius: dp(12);
+  margin: 1rem 0;
+  padding: 1rem;
+  position: relative;
+  width: 100%;
+
+  transition-duration: 250ms;
+  transition-timing-function: ease-in-out;
+
+  --md-elevation-level: 1;
+
+  .content {
+    margin-top: 1rem;
+  }
+
+  &:hover {
+    --md-elevation-level: 3;
+  }
+}
+
+.icon-parent {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+}
+
+.parameter-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+
+  & > * {
+    flex: 1;
+  }
+}
+
+.parameters {
+  --md-list-item-trailing-supporting-text-size: var(--md-sys-typescale-body-medium-size, 0.875rem);
+  --md-list-item-supporting-text-size: var(--md-sys-typescale-label-small-size, 0.6875rem);
+}
+
+@media screen and (max-width: 690px) {
+  .parameter-container {
+    flex-direction: column;
+  }
+}

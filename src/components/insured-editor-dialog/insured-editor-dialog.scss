@@ -1,0 +1,13 @@
+.content,
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.content {
+  flex-direction: column;
+}
+
+.row > * {
+  flex: 1;
+}

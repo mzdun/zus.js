@@ -1,0 +1,25 @@
+@use './shared';
+
+@import 'normalize.css';
+
+@include shared.styles;
+
+body {
+  @include shared.body-typography();
+  @include shared.colors('background');
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group {
+  display: flex;
+
+  margin: 1rem 0;
+
+  flex-direction: row;
+  gap: 1rem;
+
+  align-items: center;
+}

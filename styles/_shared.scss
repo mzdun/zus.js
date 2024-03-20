@@ -1,0 +1,85 @@
+@use 'sass:map';
+@use '@material/web/tokens/md-sys-color';
+@use '@material/web/tokens/md-sys-typescale';
+@use '@material/web/tokens/v0_192/md-sys-typescale' as v0_192-md-sys-typescale;
+
+@use '@material/web/color/color';
+@use '@material/web/tokens';
+@use '@material/web/typography/typeface';
+
+@use 'palette';
+
+$_default: (
+  'md-sys-color': palette.values-light(),
+  'md-sys-typescale': md-sys-typescale.values(),
+);
+
+@function body-values($deps: $_default) {
+  @return (
+    'panel-background-color': map.get($deps, 'md-sys-color', 'background'),
+    'panel-text-color': map.get($deps, 'md-sys-color', 'on-background'),
+    'body-background-color': map.get($deps, 'md-sys-color', 'background'),
+    'body-text-color': map.get($deps, 'md-sys-color', 'on-background'),
+    'body-text-font': map.get($deps, 'md-sys-typescale', 'body-large-font'),
+    'body-text-line-height':
+      map.get($deps, 'md-sys-typescale', 'body-large-line-height'),
+    'body-text-size': map.get($deps, 'md-sys-typescale', 'body-large-size'),
+    'body-text-tracking':
+      map.get($deps, 'md-sys-typescale', 'body-large-tracking'),
+    'body-text-weight': map.get($deps, 'md-sys-typescale', 'body-large-weight')
+  );
+}
+
+@mixin styles() {
+  :root {
+    $tokens: body-values();
+
+    @each $token, $value in $tokens {
+      --_#{$token}: #{$value};
+    }
+    @each $token, $value in md-sys-typescale.values() {
+      --md-sys-typescale-#{$token}: #{$value};
+    }
+
+    @include palette.light-theme;
+    @include typeface.theme(tokens.md-ref-typeface-values());
+
+    @media (prefers-color-scheme: dark) {
+      @include palette.dark-theme;
+    }
+  }
+}
+
+@mixin body-typography() {
+  font-family: var(--_body-text-font);
+  font-size: var(--_body-text-size);
+  line-height: var(--_body-text-line-height);
+  font-weight: var(--_body-text-weight);
+}
+
+@mixin body-color() {
+  color: var(--_body-text-color);
+  background-color: var(--_body-background-color);
+}
+
+@mixin panel-color() {
+  color: var(--_panel-text-color);
+  background-color: var(--_panel-background-color);
+}
+
+@mixin container($tokens: ()) {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  @each $token, $value in $tokens {
+    #{$token}: #{$value};
+  }
+}
+
+@mixin colors($type) {
+  color: var(--md-sys-color-on-#{$type});
+  background-color: var(--md-sys-color-#{$type});
+}

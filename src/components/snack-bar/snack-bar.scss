@@ -1,0 +1,22 @@
+:host {
+  position: absolute;
+  bottom: 2rem;
+  left: 4rem;
+  right: 4rem;
+}
+
+.container {
+  color: var(--md-sys-color-inverse-on-surface);
+  background: var(--md-sys-color-inverse-surface);
+  opacity: 1;
+  display: none;
+  position: relative;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+
+  --md-elevation-level: 3;
+
+  &.visible {
+    display: block;
+  }
+}

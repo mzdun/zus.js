@@ -1,0 +1,16 @@
+@use './shared';
+
+@use 'common.scss';
+
+.container {
+  min-height: 200px;
+  min-width: 300px;
+
+  padding: 2rem;
+
+  @include shared.container(
+    (
+      'justify-content': 'center',
+    )
+  );
+}

@@ -1,0 +1,66 @@
+@use 'sass:math';
+@use '@material/web/tokens/md-sys-typescale';
+@use '../typography';
+@use '../../../styles/shared';
+
+@use '../reset';
+
+@function dp($size) {
+  @return math.div($size, 12) * 1rem;
+}
+
+.panel {
+  @include shared.colors('surface');
+
+  border-radius: dp(12);
+  margin: 1rem 0;
+  padding: 1rem;
+  position: relative;
+  width: 100%;
+
+  transition-duration: 250ms;
+  transition-timing-function: ease-in-out;
+
+  --md-elevation-level: 1;
+
+  .headers {
+    h1 {
+      @include typography.headline(medium);
+    }
+    h2 {
+      @include typography.title(medium);
+    }
+
+    h1 + h2 {
+      margin-top: 1rem;
+    }
+  }
+
+  .content,
+  .free-content {
+    margin: 0;
+    padding: 0;
+    position: relative;
+
+    @include typography.body(large);
+  }
+
+  .free-content {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+
+    .relative {
+      position: relative;
+    }
+  }
+
+  .headers + .content {
+    margin-top: 1rem;
+  }
+
+  &:hover {
+    --md-elevation-level: 3;
+  }
+}

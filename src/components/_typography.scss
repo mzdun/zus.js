@@ -1,0 +1,45 @@
+@use 'sass:map';
+@use '@material/web/tokens/md-sys-typescale';
+
+$_default: (
+  'md-sys-typescale': md-sys-typescale.values(),
+);
+
+@mixin fonts($group, $size, $deps: $_default) {
+  font-size: map.get($deps, 'md-sys-typescale', $group + '-' + $size + '-size');
+  font-weight: map.get($deps, 'md-sys-typescale', $group + '-' + $size + '-weight');
+  line-height: map.get($deps, 'md-sys-typescale', $group + '-' + $size + '-line-height');
+  letter-spacing: map.get($deps, 'md-sys-typescale', $group + '-' + $size + '-tracking');
+}
+
+@mixin small($group) {
+  @include fonts($group, 'small');
+}
+
+@mixin medium($group) {
+  @include fonts($group, 'medium');
+}
+
+@mixin large($group) {
+  @include fonts($group, 'large');
+}
+
+@mixin display($size) {
+  @include fonts('display', $size);
+}
+
+@mixin headline($size) {
+  @include fonts('headline', $size);
+}
+
+@mixin title($size) {
+  @include fonts('title', $size);
+}
+
+@mixin body($size) {
+  @include fonts('body', $size);
+}
+
+@mixin label($size) {
+  @include fonts('label', $size);
+}

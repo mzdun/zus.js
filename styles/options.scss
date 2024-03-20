@@ -1,0 +1,9 @@
+@use './shared';
+
+@use 'common.scss';
+
+.container {
+  min-height: 100vh;
+
+  @include shared.container();
+}

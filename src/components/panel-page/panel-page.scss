@@ -1,0 +1,109 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+@mixin typescale($group, $size) {
+  font-family: var(--md-sys-typescale-#{$group}-#{$size}-font);
+  font-size: var(--md-sys-typescale-#{$group}-#{$size}-size);
+  font-weight: var(--md-sys-typescale-#{$group}-#{$size}-weight);
+}
+
+md-tabs {
+  --inline-size: 50vw;
+  min-inline-size: var(--inline-size);
+}
+
+md-tabs.scrolling {
+  inline-size: var(--inline-size);
+  width: 100%;
+}
+
+.report-house {
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.report {
+  width: 100%;
+  height: 100%;
+  padding: 1em;
+  box-sizing: border-box;
+
+  &.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    --md-circular-progress-size: 96px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 2rem auto;
+    gap: 0.5rem;
+  }
+
+  hr {
+    --border-color: var(--md-sys-color-outline-variant, var(--md-sys-color-outline, rgb(68, 72, 62)));
+    border: none;
+    border-top: 1px solid var(--border-color);
+    grid-column: 1/3;
+    width: 100%;
+  }
+
+  .section-id {
+    @include typescale(headline, large);
+    font-weight: bold;
+    grid-column: 1/3;
+  }
+
+  .field-row {
+    grid-column: 1/3;
+  }
+
+  .field-id {
+    @include typescale(body, large);
+    font-weight: bold;
+    text-align: right;
+    grid-column: 1;
+  }
+
+  .field-value {
+    @include typescale(body, large);
+    font-weight: normal;
+    text-align: left;
+    grid-column: 2;
+
+    &.field-align-left {
+      text-align: left;
+    }
+
+    &.field-align-center {
+      text-align: center;
+    }
+
+    &.field-align-right {
+      text-align: right;
+    }
+  }
+}
+
+#summary-panel {
+  --md-list-item-trailing-supporting-text-size: var(--md-sys-typescale-body-medium-size, 0.875rem);
+  --md-list-item-supporting-text-size: var(--md-sys-typescale-label-small-size, 0.6875rem);
+}
+
+.bottom-bar {
+  height: 3rem;
+  padding: 1rem 1rem 0 1rem;
+  box-sizing: content-box;
+}
+
+.error {
+  color: var(--md-sys-color-error, #800);
+}
