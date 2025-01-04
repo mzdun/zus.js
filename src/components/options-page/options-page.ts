@@ -20,7 +20,7 @@ import { html, LitElement, nothing } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 
 import { LocalStorageController } from '../../controllers/storage-controller';
-import { Insured } from '../../utils/storage';
+import { Insured, minimalFor } from '../../utils/storage';
 import {
     InsuredEditorDialog,
     InsuredEditorOperation,
@@ -113,7 +113,10 @@ export class OptionsPageElement extends LitElement {
         const { version } = chrome.runtime.getManifest();
         const containerClass = `container size-${this.size}`;
 
-        const { insured, minimal } = this.#controller.data;
+        const { insured } = this.#controller.data;
+        const { month, year } = this.#controller.date;
+        const minimal = minimalFor(month, year, this.#controller.data);
+
         return html`
     <div class=${containerClass}>
         <h1 class="text-headline title">
@@ -156,7 +159,7 @@ export class OptionsPageElement extends LitElement {
               <md-icon>edit</md-icon>
             </md-icon-button>
           </div>
-          ${renderParameters(this.#controller.data)}
+          ${renderParameters(this.#controller.data, month, year)}
           <properties-editor-dialog
             @invalid=${this.#onInvalid}
           ></properties-editor-dialog>

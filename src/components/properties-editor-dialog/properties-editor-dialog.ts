@@ -12,7 +12,7 @@ import { ifDefined } from 'lit/directives/if-defined.js'
 
 import { Rate, storage, LocalStorageData } from '../../utils/storage';
 import { ValidationErrorsEvent } from '../insured-editor-dialog/insured-editor-dialog';
-import { AMOUNTS, Input, onCancel, RATES, SCALAR_RATES } from '../ui';
+import { AMOUNTS, HISTORICAL_AMOUNTS, Input, onCancel, RATES, SCALAR_RATES } from '../ui';
 
 import styles from './properties-editor-dialog.scss';
 
@@ -46,13 +46,14 @@ export class PropertiesEditorDialog extends LitElement {
     async show(data: LocalStorageData) {
         this.form?.reset();
 
+        const historicalAmounts = HISTORICAL_AMOUNTS.map(({ getter }) => <Property<number>>{ id: getter, value: data[getter] ?? 0 });
         const amounts = AMOUNTS.map(({ getter }) => <Property<number>>{ id: getter, value: data[getter] ?? 0 });
         const scalarRates = SCALAR_RATES.map(
             ({ getter }) => <Property<number>>{ id: getter, value: data[getter] ?? 0 },
         );
         const rates = RATES.map(({ getter }) => <Property<Rate>>{ id: getter, value: data[getter] ?? {} });
 
-        this.amounts = amounts;
+        this.amounts = [...historicalAmounts, ...amounts];
         this.scalarRates = scalarRates;
         this.rates = rates;
 
@@ -131,7 +132,7 @@ export class PropertiesEditorDialog extends LitElement {
         return html`
             <form slot="content" id="form" method="dialog" class="contentz">
                 <div id="panel-amounts" class="section" role="tabpanel">
-                    ${AMOUNTS.map(({ label, getter }) =>
+                    ${[...HISTORICAL_AMOUNTS, ...AMOUNTS].map(({ label, getter }) =>
                         this.#renderInput(
                             {
                                 label: `${label} (z\u0142)`,

@@ -53,7 +53,7 @@ export interface SessionStorageData {
 
 export const defaultLocalStorage: LocalStorageData = {
     insured: [],
-    minimal: 4242,
+    minimal: 0,
     cost_of_obtaining: 250,
     tax_free_allowance: 30_000,
     free_amount: 450,
@@ -85,7 +85,7 @@ export class StorageArea<StorageDataType extends LocalStorageData | SessionStora
 
     set(data: StorageDataType): Promise<void> {
         return new Promise((resolve, reject) => {
-            this.area.set(data, () => {
+            this.area.set(data as unknown as {[x: string]: unknown}, () => {
                 if (chrome.runtime.lastError) {
                     return reject(chrome.runtime.lastError);
                 }
@@ -130,3 +130,54 @@ export const storage = {
     local: new StorageArea<LocalStorageData>(chrome.storage.local),
     session: new StorageArea<SessionStorageData>(chrome.storage.session),
 };
+
+export interface DatedMinimal {
+    year: number;
+    month: number;
+    amount: number;
+}
+
+export interface ExtensionConfig {
+    minimal?: DatedMinimal[];
+};
+
+export type ChromeManifest = chrome.runtime.ManifestV3 & {
+    x_zus_config?: ExtensionConfig;
+};
+
+export function minimalFor(month: number, year: number, data: LocalStorageData) {
+    if (data.minimal > 0) {
+        return data.minimal;
+    }
+
+    let result: DatedMinimal | undefined;
+    let resultTag = 0;
+    const tag = year * 100 + month;
+
+    const manifest = chrome.runtime.getManifest() as ChromeManifest;
+    const { minimal = [] } = manifest.x_zus_config ?? {};
+    
+    for (const dated of minimal) {
+        const datedTag = dated.year * 100 + dated.month;
+        if (datedTag > tag) {
+            continue;
+        }
+        if (datedTag < resultTag) {
+            continue;
+        }
+        resultTag = datedTag;
+        result = dated;
+    }
+
+    return result?.amount ?? 0;
+}
+
+export function minimalForLastMonth(data: LocalStorageData) {
+    const { month, year } = lastMonthEx();
+    return minimalFor(month, year, data);
+}
+
+export function minimalForSession(session: SessionStorageData, data: LocalStorageData) {
+    const { month, year } = session;
+    return minimalFor(month, year, data);
+}

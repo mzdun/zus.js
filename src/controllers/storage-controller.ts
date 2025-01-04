@@ -26,7 +26,7 @@ function packRCAReport(report: RCAReport, index: number | undefined): Report {
 export class LocalStorageController implements ReactiveController {
     host: ReactiveControllerHost;
     data: LocalStorageData = { ...defaultLocalStorage };
-    date = lastMonth();
+    date = lastMonthEx();
     reportsReady = false;
     rcaReports: RCAReport[] = [];
     draReport?: DRAReport;
@@ -58,6 +58,8 @@ export class LocalStorageController implements ReactiveController {
             return;
         }
         this.#identifier = value;
+        const [month, year] = value[1].split('-').map((v) => parseInt(v, 10))
+        this.date = {month, year};
         this.#startCalculatingReports();
         this.host.requestUpdate();
     }
@@ -122,7 +124,8 @@ export class LocalStorageController implements ReactiveController {
     #calculateReports = () => {
         const key = this.identifier;
         const { insured } = this.data;
-        this.rcaReports = insured.map((insured) => createRCAReport(insured, this.data, key));
+        const { month, year } = this.date;
+        this.rcaReports = insured.map((insured) => createRCAReport(insured, this.data, key, month, year));
         this.draReport = createDRAReport(this.rcaReports, this.data, key);
 
         if (this.rcaReports.length === 1) {
