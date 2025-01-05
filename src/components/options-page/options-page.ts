@@ -114,61 +114,58 @@ export class OptionsPageElement extends LitElement {
         const containerClass = `container size-${this.size}`;
 
         const { insured } = this.#controller.data;
-        const { month, year } = this.#controller.date;
-        const minimal = minimalFor(month, year, this.#controller.data);
+
+        const today = new Date();
+        const month = today.getMonth() + 1;
+        const year = today.getFullYear();
+        const minimal = minimalFor(month, year, this.#controller.data, this.#controller.minimal);
 
         return html`
-    <div class=${containerClass}>
-        <h1 class="text-headline title">
-            <img src="/icons/zus.svg" />
-            <span>Raporty <b>ZUS DRA/RCA</b> <small>(${version})</small></span>
-        </h1>
-        <simple-card heading="Ubezpieczeni">
-          <md-list>
-            ${
-                (insured ?? []).length > 0
-                    ? nothing
-                    : html`
-                          <md-list-item type="button" @click=${this.#addInsured}>
-                              Lista jest pusta
-                              <div slot="supporting-text">Kliknij tutaj, żeby dodać pierwszego ubezpieczonego</div>
-                          </md-list-item>
-                      `
-            }
-            ${[...(insured ?? [])].map(employeeItem(minimal, this.#editInsured))}
-          </md-list>
-          <div class="icon-parent" slot="relative">
-            <md-icon-button
-              aria-label="Dodaj ubezpieczonego"
-              @click=${this.#addInsured}>
-              <md-icon>person_add</md-icon>
-            </md-icon-button>
-          </div>
-          <insured-editor-dialog
-            @remove=${this.#onRemove}
-            @store=${this.#onStore}
-            @invalid=${this.#onInvalid}
-          ></insured-editor-dialog>
-        </simple-card>
+            <div class=${containerClass}>
+                <h1 class="text-headline title">
+                    <img src="/icons/zus.svg" />
+                    <span>Raporty <b>ZUS DRA/RCA</b> <small>(${version})</small></span>
+                </h1>
+                <simple-card heading="Ubezpieczeni">
+                    <md-list>
+                        ${(insured ?? []).length > 0
+                            ? nothing
+                            : html`
+                                  <md-list-item type="button" @click=${this.#addInsured}>
+                                      Lista jest pusta
+                                      <div slot="supporting-text">
+                                          Kliknij tutaj, żeby dodać pierwszego ubezpieczonego
+                                      </div>
+                                  </md-list-item>
+                              `}
+                        ${[...(insured ?? [])].map(employeeItem(minimal, this.#editInsured))}
+                    </md-list>
+                    <div class="icon-parent" slot="relative">
+                        <md-icon-button aria-label="Dodaj ubezpieczonego" @click=${this.#addInsured}>
+                            <md-icon>person_add</md-icon>
+                        </md-icon-button>
+                    </div>
+                    <insured-editor-dialog
+                        @remove=${this.#onRemove}
+                        @store=${this.#onStore}
+                        @invalid=${this.#onInvalid}
+                    ></insured-editor-dialog>
+                </simple-card>
 
-        <simple-card heading="Parametry">
-          <div class="icon-parent" slot="relative">
-            <md-icon-button
-              aria-label="Edytuj parametry"
-              @click=${this.#editProperties}>
-              <md-icon>edit</md-icon>
-            </md-icon-button>
-          </div>
-          ${renderParameters(this.#controller.data, month, year)}
-          <properties-editor-dialog
-            @invalid=${this.#onInvalid}
-          ></properties-editor-dialog>
-        </simple-card>
+                <simple-card heading="Parametry">
+                    <div class="icon-parent" slot="relative">
+                        <md-icon-button aria-label="Edytuj parametry" @click=${this.#editProperties}>
+                            <md-icon>edit</md-icon>
+                        </md-icon-button>
+                    </div>
+                    ${renderParameters(this.#controller.data, month, year, this.#controller.minimal)}
+                    <properties-editor-dialog @invalid=${this.#onInvalid}></properties-editor-dialog>
+                </simple-card>
 
-        ${renderConfirmation(this, this.#onConfirmedRemove)}
-        <snack-bar id='snackbar'></snack-bar>
-    </div>
-    `;
+                ${renderConfirmation(this, this.#onConfirmedRemove)}
+                <snack-bar id="snackbar"></snack-bar>
+            </div>
+        `;
     }
 }
 

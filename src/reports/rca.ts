@@ -1,11 +1,18 @@
-import { Insured, LocalStorageData, minimalFor } from '../utils/storage';
+import { DatedMinimal, Insured, LocalStorageData, minimalFor } from '../utils/storage';
 
 import { ReportTemplate, TIME_RATIO } from './model';
 import { calcPart, positive, roundAt100ths, roundAt1s } from './utils';
 
-export function createRCAReport(insured: Insured, data: LocalStorageData, key: [string, string], month: number, year: number) {
+export function createRCAReport(
+    insured: Insured,
+    data: LocalStorageData,
+    key: [string, string],
+    month: number,
+    year: number,
+    minimal: DatedMinimal[],
+) {
     const [dzielnik = 1, dzielna = 1] = insured.ratio ?? [];
-    const salary = insured.salary ?? minimalFor(month, year, data);
+    const salary = insured.salary ?? minimalFor(month, year, data, minimal);
     const podstawa = roundAt100ths((salary * dzielnik) / dzielna);
 
     const kwota_obnizajaca_podatek = roundAt100ths((data.tax_free_allowance * data.tax_rate) / 100 / 12);

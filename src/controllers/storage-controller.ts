@@ -5,6 +5,7 @@ import { Report } from '../reports/model';
 import { createRCAReport, RCA_TEMPLATE, RCAReport } from '../reports/rca';
 import { fillReportSections } from '../reports/template';
 import {
+    DatedMinimal,
     Insured,
     LocalStorageData,
     SessionStorageData,
@@ -13,6 +14,7 @@ import {
     formatLastMonth,
     lastMonth,
     lastMonthEx,
+    loadMinimalSalaryHistory,
     storage,
 } from '../utils/storage';
 
@@ -26,13 +28,14 @@ function packRCAReport(report: RCAReport, index: number | undefined): Report {
 export class LocalStorageController implements ReactiveController {
     host: ReactiveControllerHost;
     data: LocalStorageData = { ...defaultLocalStorage };
-    date = lastMonthEx();
+    minimal: DatedMinimal[] = [];
     reportsReady = false;
     rcaReports: RCAReport[] = [];
     draReport?: DRAReport;
     reportViews: Report[] = [];
 
     #identifier: [string, string] = ['01', lastMonth()];
+    #date = lastMonthEx();
     #timer = 0;
 
     constructor(host: ReactiveControllerHost) {
@@ -58,14 +61,20 @@ export class LocalStorageController implements ReactiveController {
             return;
         }
         this.#identifier = value;
-        const [month, year] = value[1].split('-').map((v) => parseInt(v, 10))
-        this.date = {month, year};
+        const [month, year] = value[1].split('-').map((v) => parseInt(v, 10));
+        this.#date = { month, year };
         this.#startCalculatingReports();
         this.host.requestUpdate();
     }
 
     hostConnected() {
         chrome.storage.onChanged.addListener(this.#onStorageUpdate);
+
+        loadMinimalSalaryHistory((data) => {
+            this.minimal = [...data];
+            this.#startCalculatingReports();
+            this.host.requestUpdate();
+        });
     }
 
     hostDisconnected() {
@@ -124,8 +133,8 @@ export class LocalStorageController implements ReactiveController {
     #calculateReports = () => {
         const key = this.identifier;
         const { insured } = this.data;
-        const { month, year } = this.date;
-        this.rcaReports = insured.map((insured) => createRCAReport(insured, this.data, key, month, year));
+        const { month, year } = this.#date;
+        this.rcaReports = insured.map((insured) => createRCAReport(insured, this.data, key, month, year, this.minimal));
         this.draReport = createDRAReport(this.rcaReports, this.data, key);
 
         if (this.rcaReports.length === 1) {

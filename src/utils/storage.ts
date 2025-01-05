@@ -85,7 +85,7 @@ export class StorageArea<StorageDataType extends LocalStorageData | SessionStora
 
     set(data: StorageDataType): Promise<void> {
         return new Promise((resolve, reject) => {
-            this.area.set(data as unknown as {[x: string]: unknown}, () => {
+            this.area.set(data as unknown as { [x: string]: unknown }, () => {
                 if (chrome.runtime.lastError) {
                     return reject(chrome.runtime.lastError);
                 }
@@ -139,13 +139,35 @@ export interface DatedMinimal {
 
 export interface ExtensionConfig {
     minimal?: DatedMinimal[];
-};
+}
 
-export type ChromeManifest = chrome.runtime.ManifestV3 & {
+type ChromeManifest = chrome.runtime.ManifestV3 & {
     x_zus_config?: ExtensionConfig;
 };
 
-export function minimalFor(month: number, year: number, data: LocalStorageData) {
+function minimalFromManifest() {
+    const manifest = chrome.runtime.getManifest() as ChromeManifest;
+    const { minimal = [] } = manifest.x_zus_config ?? {};
+    return minimal;
+}
+
+const configURL = 'https://raw.githubusercontent.com/mzdun/zus.js/refs/heads/main/config.json';
+
+async function minimalFromGithub() {
+    const doc = await fetch(configURL);
+    const json = (await doc.json()) as ExtensionConfig;
+    const { minimal = [] } = json ?? {};
+    return minimal;
+}
+
+const cachedGithubMinimal = minimalFromGithub();
+
+export function loadMinimalSalaryHistory(cb: (minimal: DatedMinimal[]) => void) {
+    cb(minimalFromManifest());
+    cachedGithubMinimal.then(cb).catch(() => {});
+}
+
+export function minimalFor(month: number, year: number, data: LocalStorageData, minimal: DatedMinimal[]) {
     if (data.minimal > 0) {
         return data.minimal;
     }
@@ -154,9 +176,6 @@ export function minimalFor(month: number, year: number, data: LocalStorageData) 
     let resultTag = 0;
     const tag = year * 100 + month;
 
-    const manifest = chrome.runtime.getManifest() as ChromeManifest;
-    const { minimal = [] } = manifest.x_zus_config ?? {};
-    
     for (const dated of minimal) {
         const datedTag = dated.year * 100 + dated.month;
         if (datedTag > tag) {
@@ -172,12 +191,19 @@ export function minimalFor(month: number, year: number, data: LocalStorageData) 
     return result?.amount ?? 0;
 }
 
-export function minimalForLastMonth(data: LocalStorageData) {
+export function minimalForLastMonth(data: LocalStorageData, minimal: DatedMinimal[]) {
     const { month, year } = lastMonthEx();
-    return minimalFor(month, year, data);
+    return minimalFor(month, year, data, minimal);
 }
 
-export function minimalForSession(session: SessionStorageData, data: LocalStorageData) {
+export function minimalForToday(data: LocalStorageData, minimal: DatedMinimal[]) {
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const year = today.getFullYear();
+    return minimalFor(month, year, data, minimal);
+}
+
+export function minimalForSession(session: SessionStorageData, data: LocalStorageData, minimal: DatedMinimal[]) {
     const { month, year } = session;
-    return minimalFor(month, year, data);
+    return minimalFor(month, year, data, minimal);
 }

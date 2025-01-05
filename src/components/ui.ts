@@ -1,7 +1,7 @@
 import { MdDialog } from '@material/web/dialog/dialog';
 import { html, TemplateResult } from 'lit';
 
-import { Insured, Ratio, LocalStorageData, minimalFor } from '../utils/storage';
+import { Insured, Ratio, LocalStorageData, minimalFor, DatedMinimal } from '../utils/storage';
 import { tr } from '../utils/tr';
 
 export interface Input {
@@ -44,9 +44,7 @@ export interface RateAccessor {
         | 'guaranteed_employee_benefits_fund';
 }
 
-export const HISTORICAL_AMOUNTS: HistoricalAmountAccessor[] = [
-    { label: tr.label.minimal, getter: 'minimal' },
-];
+export const HISTORICAL_AMOUNTS: HistoricalAmountAccessor[] = [{ label: tr.label.minimal, getter: 'minimal' }];
 
 export const AMOUNTS: AmountAccessor[] = [
     { label: tr.label.cost_of_obtaining, getter: 'cost_of_obtaining' },
@@ -161,26 +159,41 @@ function renderAmount(data: LocalStorageData, { label, getter }: AmountAccessor)
     `;
 }
 
-const historicalLookup: Record<HistoricalAmountAccessor['getter'], (month: number, year: number, data: LocalStorageData) => number> = {
-    "minimal": minimalFor
+const historicalLookup: Record<
+    HistoricalAmountAccessor['getter'],
+    (month: number, year: number, data: LocalStorageData, minimal: DatedMinimal[]) => number
+> = {
+    minimal: minimalFor,
 };
 
-function historicalTrailingText(data: LocalStorageData, { getter }: HistoricalAmountAccessor, month: number, year: number) {
+function historicalTrailingText(
+    data: LocalStorageData,
+    { getter }: HistoricalAmountAccessor,
+    month: number,
+    year: number,
+    minimal: DatedMinimal[],
+) {
     const value = data[getter] ?? 0;
     if (value) {
         return roundedPLN(value);
     }
 
-    const lookedUp = historicalLookup[getter](month, year, data);
+    const lookedUp = historicalLookup[getter](month, year, data, minimal);
     if (lookedUp) {
-        return html`${roundedPLN(lookedUp)} <i><small>(${month}-${year})</small></i>`
+        return html`${roundedPLN(lookedUp)} <i><small>(${month}-${year})</small></i>`;
     }
 
-    return html`<i>brak</i>`
+    return html`<i>brak</i>`;
 }
 
-function renderHistoricalAmount(data: LocalStorageData, accessor: HistoricalAmountAccessor, month: number, year: number) {
-    const trailingText = historicalTrailingText(data, accessor, month, year);
+function renderHistoricalAmount(
+    data: LocalStorageData,
+    accessor: HistoricalAmountAccessor,
+    month: number,
+    year: number,
+    minimal: DatedMinimal[],
+) {
+    const trailingText = historicalTrailingText(data, accessor, month, year, minimal);
     return html`
         <md-list-item>
             <div slot="headline">${accessor.label}</div>
@@ -200,17 +213,27 @@ function renderScalarRate(data: LocalStorageData, { label, getter }: ScalarRateA
     `;
 }
 
-function isScalarRate(item: HistoricalAmountAccessor | AmountAccessor | ScalarRateAccessor): item is ScalarRateAccessor {
+function isScalarRate(
+    item: HistoricalAmountAccessor | AmountAccessor | ScalarRateAccessor,
+): item is ScalarRateAccessor {
     return (ScalarRateGetters as readonly string[]).includes(item.getter);
 }
 
-function isHistoricalAmount(item: HistoricalAmountAccessor | AmountAccessor | ScalarRateAccessor): item is HistoricalAmountAccessor {
+function isHistoricalAmount(
+    item: HistoricalAmountAccessor | AmountAccessor | ScalarRateAccessor,
+): item is HistoricalAmountAccessor {
     return (HistoricalAmountGetters as readonly string[]).includes(item.getter);
 }
 
-function renderAmountOrScalarRate(data: LocalStorageData, item: HistoricalAmountAccessor | AmountAccessor | ScalarRateAccessor, month: number, year: number) {
+function renderAmountOrScalarRate(
+    data: LocalStorageData,
+    item: HistoricalAmountAccessor | AmountAccessor | ScalarRateAccessor,
+    month: number,
+    year: number,
+    minimal: DatedMinimal[],
+) {
     if (isScalarRate(item)) return renderScalarRate(data, item);
-    if (isHistoricalAmount(item)) return renderHistoricalAmount(data, item, month, year);
+    if (isHistoricalAmount(item)) return renderHistoricalAmount(data, item, month, year, minimal);
     return renderAmount(data, item);
 }
 
@@ -235,17 +258,31 @@ function renderParameterGroup<Accessor>(
     items: Accessor[],
     month: number,
     year: number,
-    render: (data: LocalStorageData, item: Accessor, month: number, year: number) => TemplateResult<1>,
+    minimal: DatedMinimal[],
+    render: (
+        data: LocalStorageData,
+        item: Accessor,
+        month: number,
+        year: number,
+        minimal: DatedMinimal[],
+    ) => TemplateResult<1>,
 ) {
-    const mapper = (item: Accessor) => render(data, item, month, year);
+    const mapper = (item: Accessor) => render(data, item, month, year, minimal);
     return html` <md-list class="parameters">${items.map(mapper)}</md-list> `;
 }
 
-export function renderParameters(data: LocalStorageData, month: number, year: number) {
+export function renderParameters(data: LocalStorageData, month: number, year: number, minimal: DatedMinimal[]) {
     return html`
         <div class="parameter-container">
-            ${renderParameterGroup(data, [...HISTORICAL_AMOUNTS, ...AMOUNTS, ...SCALAR_RATES], month, year, renderAmountOrScalarRate)}
-            ${renderParameterGroup(data, RATES, month, year, renderRate)}
+            ${renderParameterGroup(
+                data,
+                [...HISTORICAL_AMOUNTS, ...AMOUNTS, ...SCALAR_RATES],
+                month,
+                year,
+                minimal,
+                renderAmountOrScalarRate,
+            )}
+            ${renderParameterGroup(data, RATES, month, year, minimal, renderRate)}
         </div>
     `;
 }
