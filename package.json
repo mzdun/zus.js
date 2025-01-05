@@ -107,25 +107,6 @@
             "32": "/icons/32x.png",
             "48": "/icons/48x.png",
             "128": "/icons/128x.png"
-        },
-        "x_zus_config": {
-            "minimal": [
-                {
-                    "year": 2024,
-                    "month": 1,
-                    "amount": 4242
-                },
-                {
-                    "year": 2024,
-                    "month": 7,
-                    "amount": 4300
-                },
-                {
-                    "year": 2025,
-                    "month": 1,
-                    "amount": 4666
-                }
-            ]
         }
     }
 }

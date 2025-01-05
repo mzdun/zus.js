@@ -7,6 +7,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CreateFilePlugin = require('create-file-webpack');
 
 const packageJson = require('./package.json');
+const configJson = require('./config.json');
 
 module.exports = {
     context: path.resolve(__dirname),
@@ -78,6 +79,7 @@ module.exports = {
                     description,
                     version,
                     ...extension,
+                    x_zus_config: configJson,
                     manifest_version: 3,
                 };
                 return JSON.stringify(manifest);

@@ -1,0 +1,19 @@
+{
+    "minimal": [
+        {
+            "year": 2024,
+            "month": 1,
+            "amount": 4242
+        },
+        {
+            "year": 2024,
+            "month": 7,
+            "amount": 4300
+        },
+        {
+            "year": 2025,
+            "month": 1,
+            "amount": 4666
+        }
+    ]
+}
