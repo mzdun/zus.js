@@ -8,7 +8,7 @@ import { MdDialog } from '@material/web/dialog/dialog.js';
 import { MdTabs } from '@material/web/tabs/tabs.js';
 import { html, LitElement, PropertyValues } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js'
+import { ifDefined } from 'lit/directives/if-defined.js';
 
 import { Rate, storage, LocalStorageData } from '../../utils/storage';
 import { ValidationErrorsEvent } from '../insured-editor-dialog/insured-editor-dialog';
@@ -46,7 +46,9 @@ export class PropertiesEditorDialog extends LitElement {
     async show(data: LocalStorageData) {
         this.form?.reset();
 
-        const historicalAmounts = HISTORICAL_AMOUNTS.map(({ getter }) => <Property<number>>{ id: getter, value: data[getter] ?? 0 });
+        const historicalAmounts = HISTORICAL_AMOUNTS.map(
+            ({ getter }) => <Property<number>>{ id: getter, value: data[getter] ?? 0 },
+        );
         const amounts = AMOUNTS.map(({ getter }) => <Property<number>>{ id: getter, value: data[getter] ?? 0 });
         const scalarRates = SCALAR_RATES.map(
             ({ getter }) => <Property<number>>{ id: getter, value: data[getter] ?? 0 },

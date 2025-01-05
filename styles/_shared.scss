@@ -21,11 +21,9 @@ $_default: (
     'body-background-color': map.get($deps, 'md-sys-color', 'background'),
     'body-text-color': map.get($deps, 'md-sys-color', 'on-background'),
     'body-text-font': map.get($deps, 'md-sys-typescale', 'body-large-font'),
-    'body-text-line-height':
-      map.get($deps, 'md-sys-typescale', 'body-large-line-height'),
+    'body-text-line-height': map.get($deps, 'md-sys-typescale', 'body-large-line-height'),
     'body-text-size': map.get($deps, 'md-sys-typescale', 'body-large-size'),
-    'body-text-tracking':
-      map.get($deps, 'md-sys-typescale', 'body-large-tracking'),
+    'body-text-tracking': map.get($deps, 'md-sys-typescale', 'body-large-tracking'),
     'body-text-weight': map.get($deps, 'md-sys-typescale', 'body-large-weight')
   );
 }

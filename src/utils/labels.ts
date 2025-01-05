@@ -13,7 +13,7 @@ export class TemplateResult {
         public readonly keys: string[],
     ) {}
     apply(data: Record<string, string | number | boolean>): string {
-        return this.raw.map((item) => (typeof item === 'string' ? item : data[this.keys[item]] ?? '')).join('');
+        return this.raw.map((item) => (typeof item === 'string' ? item : (data[this.keys[item]] ?? ''))).join('');
     }
 }
 

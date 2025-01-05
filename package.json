@@ -10,7 +10,7 @@
         "build": "webpack --config webpack.prod.cjs",
         "lint": "eslint \"src/**/*.{js,jsx,ts,tsx,html}\" --quiet --fix",
         "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx,html}\" --fix ",
-        "prettier": "pretty-quick --staged && eslint \"src/**/*.{js,jsx,ts,tsx,html}\" --fix"
+        "clean": "pretty-quick --staged && eslint \"src/**/*.{js,jsx,ts,tsx,html}\" --fix"
     },
     "dependencies": {
         "@babel/runtime": "^7.26.0",
